@@ -1,8 +1,10 @@
+import os
 from numpy.distutils.core import Extension
+
 
 f90periodogram = Extension(name='f90periodogram',
                            sources=['seismo/src/periodogram.f90'],
-                           extra_compile_args = ["-fopenmp"],
+                           extra_f90_compile_args = ["-fopenmp", "-lgomp"],
                            extra_link_args = ["-lgomp"])
 
 if __name__ == "__main__":
