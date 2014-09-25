@@ -1,7 +1,10 @@
 seismo
 ======
 
-Place to keep my asteroseismology-related stuff
+Visit the [homepage](http://ezietsman.github.io/seismo)
+
+
+This started as a place to keep my asteroseismology-related stuff
 
 ## Note
 
