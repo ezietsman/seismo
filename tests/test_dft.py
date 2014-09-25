@@ -49,7 +49,7 @@ def test_periodogram_parallel_4thread():
 
 
 def test_periodogram_opencl():
-    ''' Test the fortran implementation of the periodogram'''
+    ''' Test the opencl implementation of the periodogram'''
     x, y, f, a_correct = create_data()
 
     a = timeseries.periodogram_opencl(x, y, f)
