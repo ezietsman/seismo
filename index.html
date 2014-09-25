@@ -1,91 +1,93 @@
 <!DOCTYPE html>
 <html>
 
-  <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="description" content="Seismo : Place to keep my asteroseismology-related stuff">
+<head>
+<meta charset='utf-8'>
+<meta http-equiv="X-UA-Compatible" content="chrome=1">
+<meta name="description" content="Seismo : Place to keep my asteroseismology-related stuff">
 
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+<link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 
-    <title>Seismo</title>
-  </head>
+<title>Seismo</title>
+</head>
 
-  <body>
+<body>
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/ezietsman/seismo">View on GitHub</a>
+<!-- HEADER -->
+<div id="header_wrap" class="outer">
+    <header class="inner">
+        <a id="forkme_banner" href="https://github.com/ezietsman/seismo">View on GitHub</a>
 
-          <h1 id="project_title">Seismo</h1>
-          <h2 id="project_tagline">Place to keep my asteroseismology-related stuff</h2>
+        <h1 id="project_title">Seismo</h1>
+        <h2 id="project_tagline">Place to keep my asteroseismology-related stuff</h2>
 
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/ezietsman/seismo/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/ezietsman/seismo/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
-    </div>
+        <section id="downloads">
+            <a class="zip_download_link" href="https://github.com/ezietsman/seismo/zipball/master">Download this project as a .zip file</a>
+            <a class="tar_download_link" href="https://github.com/ezietsman/seismo/tarball/master">Download this project as a tar.gz file</a>
+        </section>
+    </header>
+</div>
 
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
+<!-- MAIN CONTENT -->
+<div id="main_content_wrap" class="outer">
+    <section id="main_content" class="inner">
         <h1>
-<a name="seismo" class="anchor" href="#seismo"><span class="octicon octicon-link"></span></a>seismo</h1>
+            <a name="seismo" class="anchor" href="#seismo"><span class="octicon octicon-link"></span></a>seismo</h1>
 
-<p>Place to keep my asteroseismology-related stuff</p>
+        <p>Lightcurve analysis for busy people.</p>
 
-<h2>
-<a name="note" class="anchor" href="#note"><span class="octicon octicon-link"></span></a>Note</h2>
+        <h2>
+            <a name="note" class="anchor" href="#note"><span class="octicon octicon-link"></span></a>Note</h2>
 
-<p>I just started this but the aim is to have a small set of tools that will allow
-me to extract frequencies from an unevenly sampled dataset e.g. Kepler
-lightcurve. This requires a LOT of processing power, which is why there are
-multiple parallel implementations of the O(N^2) Deeming periodogram, including
-one that runs on my GPU via <code>opencl</code>.</p>
+        <p>The aim is to have a small set of tools that will allow
+        me to extract frequencies from an unevenly sampled dataset e.g. Kepler
+        lightcurve. This requires a LOT of processing power, which is why there are
+        multiple parallel implementations of the O(N^2) Deeming periodogram, including
+        one that runs on my GPU via <code>opencl</code>. That one is
+        <strong>FAST</strong>.</p>
 
-<h2>
-<a name="modules" class="anchor" href="#modules"><span class="octicon octicon-link"></span></a>Modules</h2>
+        <h2>
+            <a name="modules" class="anchor" href="#modules"><span class="octicon octicon-link"></span></a>Modules</h2>
 
-<p>seismo contains the following modules:</p>
+        <p>seismo contains the following modules:</p>
 
-<ul>
-<li>timeseries - contains some DFT implementations</li>
-<li>fitting - will contain frequency fitting routines</li>
-</ul><h2>
-<a name="tests" class="anchor" href="#tests"><span class="octicon octicon-link"></span></a>Tests</h2>
+        <ul>
+            <li>timeseries - contains some DFT implementations</li>
+            <li>fitting - will contain frequency fitting routines</li>
+        </ul><h2>
+            <a name="tests" class="anchor" href="#tests"><span class="octicon octicon-link"></span></a>Tests</h2>
 
-<p>Run the tests with:</p>
+        <p>Run the tests with:</p>
 
-<pre><code>py.test tests
-</code></pre>
+        <pre><code>py.test tests
+        </code></pre>
 
-<h2>
-<a name="goals" class="anchor" href="#goals"><span class="octicon octicon-link"></span></a>Goals</h2>
+        <h2>
+            <a name="goals" class="anchor" href="#goals"><span class="octicon octicon-link"></span></a>Goals</h2>
 
-<p>Kepler datasets can be very long and contain many datapoints. These take a long
-time to calculate via a naive O(N^2) algorithm (but needed because I don't have
-a better algorithm for unevenly sampled data that I'm happy with). For this
-reason I'm trying to create something that can run more or less with only some
-user input, so that I can let it run by itself and save each step in the
-output.</p>
+        <p>Kepler datasets can be very long and contain many datapoints. These take a long
+        time to calculate via a naive O(N^2) algorithm (but needed because I don't have
+        a better algorithm for unevenly sampled data that I'm happy with). For this
+        reason I'm trying to create something that can run more or less with only some
+        user input, so that I can let it run by itself and save each step in the
+        output.</p>
 
-<p>Each DFT for the particular dataset I'm interested in takes about 50min to run
-on my GTX 760, and about 16 hours on my MBP's i5 with 2 threads, and I may need to do 40 - 50 of them to extract all the
-frequencies. (Donations for a Nvidia 980 welcome)</p>
-      </section>
-    </div>
+        <p>Each DFT for the particular dataset I'm interested in at the moment takes
+        about 50 minutes to run on my GTX 760, and about 16 hours on my MBP's i5 with 2
+        threads, and I may need to do 40 - 50 of them to extract all the frequencies.
+        (Donations for a Nvidia 980 welcome)</p>
+    </section>
+</div>
 
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
+<!-- FOOTER  -->
+<div id="footer_wrap" class="outer">
+    <footer class="inner">
         <p class="copyright">Seismo maintained by <a href="https://github.com/ezietsman">ezietsman</a></p>
         <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
-      </footer>
-    </div>
+    </footer>
+</div>
 
-    
 
-  </body>
+
+</body>
 </html>
