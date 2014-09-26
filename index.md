@@ -6,10 +6,9 @@ layout: default
 
 ## Welcome
 
-Seismo is new. I need Seismo for finding and extracting signals in really long
-lightcurves, so I need it to be able to go really fast too, and that means that
-it needs to be able to advantage of multiple cores or if you have one, the GPU
-in my computer.
+Seismo is new. Seismo is for finding and extracting signals in really long
+lightcurves, so it needs to be able to go really fast too, and that means that
+it needs to be able to advantage of multiple cores or GPUs in your computer.
 
 At the moment Seismo can only do Deeming Periodograms but this will change
 quickly.
