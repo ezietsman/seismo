@@ -38,6 +38,7 @@ if __name__ == "__main__":
     freqs = np.linspace(0, nyuquist, 5*int(nyuquist/fres))
     amps = timeseries.periodogram_opencl(t, s, freqs)
 
+    fig = plt.figure()
     # make some plots
     plt.subplot(211)
     plt.plot(t, s, '.')
@@ -51,4 +52,5 @@ if __name__ == "__main__":
     plt.xlabel(r"Frequency (day$^{-1}$)")
     plt.ylabel("Amplitude (mag)")
 
+    fig.subplots_adjust(hspace=0.5)
     plt.show()
