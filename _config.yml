@@ -1,4 +1,4 @@
 include: [_includes]
-production_url: http://ezietsman.github.io
+production_url: http://ezietsman.github.io/seismo
 baseurl: /
 
