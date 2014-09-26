@@ -10,10 +10,9 @@ matplotlib.style.use('ggplot')
 
 if __name__ == "__main__":
     # create some fake data
-    t = np.linspace(0, 2, 1000)
+    t = np.linspace(0, 20, 10000)
 
     # let's add some random sine waves
-
     N_signals = 5
 
     signal = fitting.signal()
@@ -27,22 +26,19 @@ if __name__ == "__main__":
         # add component to signal
         signal.add_component(component)
 
-
     # evaluate signal at times
-    s = signal.eval_components(t) + 0.0025*np.random.randn(t.size)
+    s = signal.eval_components(t) + 0.025*np.random.randn(t.size)
 
     # now calculate the DFT
     # Need to know Nyquist (more or less)
     nyuquist = 0.5/((t[1] - t[0]))
 
-    # need to know freq resolution
+    # need to know freq resolution and oversample
     fres = 1.0/(t[-1] - t[0])
     freqs = np.linspace(0, nyuquist, 5*int(nyuquist/fres))
     amps = timeseries.periodogram_opencl(t, s, freqs)
 
-
     # make some plots
-
     plt.subplot(211)
     plt.plot(t, s, '.')
     plt.xlabel("Time (days)")
@@ -54,6 +50,5 @@ if __name__ == "__main__":
     plt.plot(freqs, amps)
     plt.xlabel(r"Frequency (day$^{-1}$)")
     plt.ylabel("Amplitude (mag)")
-
 
     plt.show()
