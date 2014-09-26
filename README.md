@@ -30,6 +30,7 @@ On Debian/Ubuntu
     
 Once pip is installed, install `seismo` with:
 
+    pip install -r requirements.txt
     pip install .
 
 in this folder.

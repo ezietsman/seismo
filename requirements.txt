@@ -1,5 +1,4 @@
-include requirements.txt
 numpy>=1.9
-pytest
+mako
 pyopencl
 scipy>=0.10
