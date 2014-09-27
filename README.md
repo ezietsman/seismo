@@ -74,5 +74,14 @@ user input, so that I can let it run by itself and save each step in the
 output.
 
 Each DFT for the particular dataset I'm interested in takes about 50min to run
-on my GTX 760, and about 16 hours on my MBP's i5 with 2 threads, and I may need to do 40 - 50 of them to extract all the
-frequencies. (Donations for a Nvidia 980 welcome)
+on my GTX 760, and about 16 hours on my MBP's i5 with 2 threads, and I may need
+to do 40 - 50 of them to extract all the frequencies. (Donations for a Nvidia
+980 welcome)
+
+
+## Changes:
+
+Version 0.1.2:
+    * Added `deeming` function that wraps the dft implementations.
+    * Updated examples
+    * added tests
