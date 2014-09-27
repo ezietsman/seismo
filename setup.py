@@ -20,7 +20,7 @@ if __name__ == "__main__":
     import setuptools
     setuptools.setup(
         name="seismo",
-        version="0.1.1",
+        version="0.1.2",
         packages=setuptools.find_packages(),
 
         install_requires=['numpy>=1.9'],

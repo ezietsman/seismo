@@ -2,8 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
 
-from seismo import fitting
-from seismo import timeseries
+import seismo
 
 matplotlib.style.use('ggplot')
 
@@ -15,14 +14,14 @@ if __name__ == "__main__":
     # let's add some random sine waves
     N_signals = 5
 
-    signal = fitting.signal()
+    signal = seismo.signal()
 
     for i in range(N_signals):
         amplitude = 0.01*np.random.rand()
         frequency = np.random.rand()*200
         phase = np.random.rand()*np.pi
 
-        component = fitting.sinewave(amplitude, frequency, phase, 0)
+        component = seismo.sinewave(amplitude, frequency, phase, 0)
         # add component to signal
         signal.add_component(component)
 
@@ -36,8 +35,9 @@ if __name__ == "__main__":
     # need to know freq resolution and oversample
     fres = 1.0/(t[-1] - t[0])
     freqs = np.linspace(0, nyuquist, 5*int(nyuquist/fres))
-    amps = timeseries.periodogram_opencl(t, s, freqs)
+    freqs, amps = seismo.deeming(t, s, freqs)
 
+    fig = plt.figure()
     # make some plots
     plt.subplot(211)
     plt.plot(t, s, '.')
@@ -51,4 +51,5 @@ if __name__ == "__main__":
     plt.xlabel(r"Frequency (day$^{-1}$)")
     plt.ylabel("Amplitude (mag)")
 
+    fig.subplots_adjust(hspace=0.5)
     plt.show()

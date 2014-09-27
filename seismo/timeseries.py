@@ -4,6 +4,7 @@ This contains some useful routines I need for finding and analysing
 frequencies in pulsating star lightcurves
 
 '''
+import multiprocessing
 
 import numpy as np
 import f90periodogram
@@ -156,3 +157,52 @@ def periodogram_numpy(t, m, freqs):
     amps = 2.0*np.sqrt(amps)/t.size
 
     return amps
+
+
+def deeming(times, values, frequencies=None, method='opencl'):
+    ''' Calculate the Deeming periodogram of values at times.
+    Inputs:
+        times: numpy array containing time_stamps
+        values: numpy array containing the measured values at times.
+        frequencies: optional numpy array at which the periodogram will be
+        calculated. If not given, (times.size) frequencies between 0 and
+        the nyquist frequency will be used.
+        method: One of 'opencl', 'openmp', 'numpy'.
+            'opencl' requires `pyopencl` to be present as well as a working
+            opencl driver. This method runs in parallel on the opencl device
+            and is potentially the fastest of the 3. This option is default.
+
+            'openmp' runs in parallel via openmp in fortran code. This can only
+            run on your CPU. It defaults to the number of cores in your machine.
+
+            'numpy' uses a serial implementation that only requires numpy to be
+            installed. This one is probably the slowest of the 3 options for
+            larger input data sizes
+
+    Returns (frequency, amplitude) arrays.
+    '''
+
+    if frequencies is None:
+        # frequencies array not given. Create one
+
+        # find the smallest differnce between two successive timestamps and use
+        # that for the nyquist calculation
+        t = np.arange(times.size-1)
+        smallest = np.min(times[t+1] - times[t])
+        nyquist = 0.5 / smallest
+
+        frequencies = np.linspace(0, nyquist, times.size)
+
+    if method == 'opencl':
+        amps = periodogram_opencl(times, values, frequencies)
+    elif method == 'openmp':
+        cores = multiprocessing.cpu_count()
+        amps = periodogram_parallel(times, values, frequencies, cores)
+    elif method == 'numpy':
+        amps = periodogram_numpy(times, values, frequencies)
+    else:
+        raise ValueError("{} is not a valid method!".format(method))
+
+    return frequencies, amps
+
+

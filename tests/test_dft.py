@@ -54,3 +54,21 @@ def test_periodogram_opencl():
 
     a = timeseries.periodogram_opencl(x, y, f)
     assert(np.allclose(a, a_correct))
+
+
+def test_deeming_numpy():
+    x, y, f, a_correct = create_data()
+    _f, a = timeseries.deeming(x, y, f, 'numpy')
+    assert(np.allclose(a, a_correct))
+
+
+def test_deeming_openmp():
+    x, y, f, a_correct = create_data()
+    _f, a = timeseries.deeming(x, y, f, 'openmp')
+    assert(np.allclose(a, a_correct))
+
+
+def test_deeming_opencl():
+    x, y, f, a_correct = create_data()
+    _f, a = timeseries.deeming(x, y, f, 'opencl')
+    assert(np.allclose(a, a_correct))
