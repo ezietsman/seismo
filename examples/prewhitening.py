@@ -14,7 +14,7 @@ def create_fake_data(N):
     print("Fake numbers")
     for i in range(N):
         amplitude = 0.05*np.random.rand()
-        frequency = np.random.rand()*200
+        frequency = np.random.rand()*600
         phase = np.random.rand()*np.pi
 
         component = seismo.sinewave(amplitude, frequency, phase, 0)
@@ -27,11 +27,11 @@ def create_fake_data(N):
 
 if __name__ == "__main__":
     # create some fake data
-    t = np.linspace(0, 20, 2500)
+    t = np.linspace(0, 2, 2500)
     signal = create_fake_data(1)
 
     # evaluate signal at times
-    s = signal.evaluate(t) + 0.01*np.random.rand(t.size)
+    s = signal.evaluate(t)
 
     # Need to know Nyquist (more or less)
     nyuquist = 0.5/((t[1] - t[0]))
