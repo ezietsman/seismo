@@ -206,3 +206,9 @@ def deeming(times, values, frequencies=None, method='opencl'):
     return frequencies, amps
 
 
+def find_peak(frequencies, amplitudes):
+    ''' Return the return (freq, amp) where amp is maximum'''
+
+    ampmax = np.where(amplitudes == amplitudes.max())
+
+    return float(frequencies[ampmax]), float(amplitudes[ampmax])
