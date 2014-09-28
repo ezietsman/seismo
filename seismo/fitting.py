@@ -28,18 +28,27 @@ class signal(object):
 
         return np.sum(_sum)
 
-    def _eval_from_list(self, _list, times, values):
-        ''' given list of parameters of all components
+    def _residuals_from_last_components(self, _list, times, values):
+        ''' Keep current compnents fixed, vary only new component'''
+        _sig = signal()
+        for comp in self.components[:-1]:
+            _sig.add_component(comp)
 
+        a, f, p = _list
+        _sine = sinewave(a, f, p, 0)
+        _sig.add_component(_sine)
+
+        return values - _sig.evaluate(times)
+
+    def _residuals_from_all_components(self, _list, times, values):
+        ''' given list of parameters of all components, times and values,
+        return residuals between function calculated from _list and values
         '''
-
-        # to evaluate from th given parameters, make a new signal object
-
         _sig = signal()
 
-        for i in range(0, len(_list), 4):
-            a, f, p, c = _list[i:i+4]
-            _sine = sinewave(a, f, p, c)
+        for i in range(0, len(_list), 3):
+            a, f, p = _list[i:i+3]
+            _sine = sinewave(a, f, p, 0)
             _sig.add_component(_sine)
 
         return values - _sig.evaluate(times)
@@ -52,25 +61,61 @@ class signal(object):
         values
         '''
 
+        _args = self.components[-1].get_parameters()[:-1]
+
+        solution = optimize.leastsq(self._residuals_from_last_components,
+                                    _args,
+                                    args=(times, values),
+                                    full_output=True)
+
+        params, cov, infodict, mesg, ier = solution
+
+        if ier not in [1, 2, 3, 4]:
+            print("Solution 1 was not found: reason given:\n{}".format(mesg))
+
+        a, f, p = params
+        self.components[-1] = sinewave(a, f, p, 0)
+
+        # now fit all signals at once
         _args = []
-
-        # make a list containing all the parameters of the components
         for comp in self.components:
-            params = comp.get_parameters()
-            for p in params:
-                _args.append(p)
+            for param in comp.get_parameters()[:-1]:
+                _args.append(param)
 
-        solution = optimize.leastsq(self._eval_from_list, _args, args=(times,
-                                                                       values))
+        solution = optimize.leastsq(self._residuals_from_all_components,
+                                    _args,
+                                    args=(times, values),
+                                    full_output=True)
 
-        print(solution)
+        params, cov, infodict, mesg, ier = solution
+
+        if ier not in [1, 2, 3, 4]:
+            print("Solution 2 was not found: reason given:\n{}".format(mesg))
+
+        self.components = []
+
+        for i in range(0, len(params), 3):
+            a, f, p = params[i: i+3]
+            # some of the amplitudes come out negative, fix those
+            if a < 0:
+                a = abs(a)
+                if p > np.pi:
+                    p -= np.pi
+                else:
+                    p += np.pi
+
+            self.add_component(sinewave(a, f, p, 0))
+
+
+
+        return  self
 
 
 class sinewave(object):
 
     ''' Class to represent a sinusoid'''
 
-    def __init__(self, amplitude=1.0, frequency=0.0, phase=0.5,
+    def __init__(self, amplitude=1.0, frequency=1.0, phase=0.5,
                  constant=0.0):
         ''' Class to represent a sinusoid.'''
 
