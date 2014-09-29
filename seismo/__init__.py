@@ -1,2 +1,2 @@
-from timeseries import deeming
-from fitting import signal, sinewave
+from .timeseries import deeming
+from .fitting import signal, sinewave
