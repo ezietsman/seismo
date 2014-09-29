@@ -26,7 +26,7 @@ if __name__ == "__main__":
         signal.add_component(component)
 
     # evaluate signal at times
-    s = signal.eval_components(t) + 0.025*np.random.randn(t.size)
+    s = signal.evaluate(t) + 0.025*np.random.randn(t.size)
 
     # now calculate the DFT
     # Need to know Nyquist (more or less)
