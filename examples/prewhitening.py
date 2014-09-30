@@ -15,8 +15,8 @@ def create_fake_data(N):
 
     print("Fake numbers")
     for i in range(N):
-        amplitude = 0.05*np.random.rand()
-        frequency = np.random.rand()*140
+        amplitude = 0.1*np.random.rand()
+        frequency = np.random.rand()*300
         phase = np.random.rand()*np.pi
 
         component = seismo.sinewave(amplitude, frequency, phase, 0)
@@ -30,11 +30,11 @@ def create_fake_data(N):
 
 if __name__ == "__main__":
     # create some fake data
-    t = np.linspace(0, 20, 10000)
+    t = np.linspace(0, 1, 750)
     fakesignal = create_fake_data(10)
 
     # evaluate signal at times
-    s = fakesignal.evaluate(t) + 0.1*np.random.randn(t.size)
+    s = fakesignal.evaluate(t) + 0.05*np.random.randn(t.size)
 
     # subtract average, random numbers may not average to 0
     s -= np.average(s)
