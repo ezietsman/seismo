@@ -8,6 +8,7 @@ import multiprocessing
 
 import numpy as np
 import f90periodogram
+from scipy.interpolate import interpolate
 
 try:
     import pyopencl as cl
@@ -15,6 +16,66 @@ try:
 except ImportError:
     print("opencl not available")
     OPENCL = False
+
+
+def strip_nan(array):
+    " strips NaN from array and return stripped array"
+
+    # strip nan
+    valid = np.logical_not(np.isnan(array))
+    return array[valid]
+
+
+def fast_deeming(times, values, pad_n=None):
+    ''' Interpolate time values to an even grid then run an FFT
+
+    returns (frequencies, amplitudes)
+
+    Input
+    -----
+    times : numpy array containing time values
+    values: numpy array containing measurements
+    pad_n : (optional) Calculate fft of this size. If this is larger than the
+    input data, it will be zero padded. See numpy.fft.fft's help for details.
+
+
+    Output
+    ------
+    frequencies: numpy array containing frequencies
+    amplitudes : numpy array containing amplitudes
+    even_times : numpy array containing interpolated times
+    even_values: numpy array containing interpolated values
+
+    Details
+    -------
+    Time values are interpolated to an even grid from min(times) to max(times)
+    containing times.size values. Interpolation is done using linear spline
+    method.
+
+    NOTE: This may not give you results as precise as deeming(), the
+    interpolation may cause spurious effects in the fourier spectrum. This
+    method is however, very fast for large N, compared to deeming()
+
+    NOTE: This method strips nan from arrays first.
+    '''
+    times = strip_nan(times)
+    values = strip_nan(values)
+
+    interpolator = interpolate.interp1d(times, values)
+
+    even_times = np.linspace(times.min(), times.max(), times.size)
+    even_vals = interpolator(even_times)
+    if pad_n:
+        amplitudes = np.abs(np.fft.fft(even_vals, pad_n))
+    else:
+        amplitudes = np.abs(np.fft.fft(even_vals, 2*even_vals.size))
+
+    amplitudes *= 2.0 / times.size
+    frequencies = np.fft.fftfreq(amplitudes.size,
+                                 d=even_times[1]-even_times[0])
+    pos = frequencies >= 0
+
+    return frequencies[pos], amplitudes[pos], even_times, even_vals
 
 
 def periodogram_opencl(t, m, f):
@@ -34,11 +95,9 @@ def periodogram_opencl(t, m, f):
 
     Note: This routine strips datapoints if it is nan
     '''
-
-    # strip nan
-    valid = np.logical_not(np.isnan(m))
-    t = t[valid]
-    m = m[valid]
+    t = strip_nan(t)
+    m = strip_nan(m)
+    f = strip_nan(f)
 
     # create a context and a job queue
     ctx = cl.create_some_context()
@@ -71,14 +130,14 @@ def periodogram_opencl(t, m, f):
             const int datalength) {
 
         int gid = get_global_id(0);
-        double this_frequency = freqs_g[gid];
         double realpart = 0.0;
         double imagpart = 0.0;
         double pi = 3.141592653589793;
+        double twopif = freqs_g[gid]*2.0*pi;
 
         for (int i=0; i < datalength; i++){
-            realpart = realpart + mags_g[i]*cos(2.0*pi*this_frequency*times_g[i]);
-            imagpart = imagpart + mags_g[i]*sin(2.0*pi*this_frequency*times_g[i]);
+            realpart = realpart + mags_g[i]*cos(twopif*times_g[i]);
+            imagpart = imagpart + mags_g[i]*sin(twopif*times_g[i]);
         }
         amps_g[gid] = 2.0*sqrt(pow(realpart, 2) + pow(imagpart, 2))/datalength;
     }
@@ -113,9 +172,9 @@ def periodogram_parallel(t, m, f, threads=None):
         threads = 4
 
     # strip nan
-    valid = np.logical_not(np.isnan(m))
-    t = t[valid]
-    m = m[valid]
+    t = strip_nan(t)
+    m = strip_nan(m)
+    f = strip_nan(f)
 
     ampsf90omp_2 = f90periodogram.periodogram2(t, m, f, t.size, f.size,
                                                threads)
@@ -141,9 +200,9 @@ def periodogram_numpy(t, m, freqs):
     '''
 
     # strip nan
-    valid = np.logical_not(np.isnan(m))
-    t = t[valid]
-    m = m[valid]
+    t = strip_nan(t)
+    m = strip_nan(m)
+    f = strip_nan(freqs)
 
     # calculate the dft
     amps = np.zeros(freqs.size, dtype='float')
@@ -194,7 +253,12 @@ def deeming(times, values, frequencies=None, method='opencl'):
         frequencies = np.linspace(0, nyquist, times.size)
 
     if method == 'opencl':
-        amps = periodogram_opencl(times, values, frequencies)
+        if OPENCL:
+            amps = periodogram_opencl(times, values, frequencies)
+        else:
+            print("WARNING! pyopencl not found. Falling back to openmp version")
+            cores = multiprocessing.cpu_count()
+            amps = periodogram_parallel(times, values, frequencies, cores)
     elif method == 'openmp':
         cores = multiprocessing.cpu_count()
         amps = periodogram_parallel(times, values, frequencies, cores)

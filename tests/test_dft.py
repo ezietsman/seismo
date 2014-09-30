@@ -16,6 +16,12 @@ def create_data():
 
     return x, y, f, a_correct
 
+def test_fast_deeming():
+    x, y, f, a_correct = create_data()
+    freqs, a, t, v = timeseries.fast_deeming(x, y)
+    assert(freqs.size == f.size)
+   # assert(np.allclose(freqs, f))
+
 
 def test_periodogram_numpy():
     ''' Test the numpy implementation of the periodogram'''
