@@ -31,4 +31,4 @@ def test_signal_eval():
     signal = fitting.signal()
     signal.add_component(s1)
     signal.add_component(s2)
-    assert(np.allclose(signal.eval_components(t), correct, atol=1e-15))
+    assert(np.allclose(signal.evaluate(t), correct, atol=1e-15))
