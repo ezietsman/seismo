@@ -18,12 +18,12 @@ except ImportError:
     OPENCL = False
 
 
-def strip_nan(array):
+def find_nan(array):
     " strips NaN from array and return stripped array"
 
     # strip nan
     valid = np.logical_not(np.isnan(array))
-    return array[valid]
+    return valid
 
 
 def fast_deeming(times, values, pad_n=None):
@@ -58,8 +58,9 @@ def fast_deeming(times, values, pad_n=None):
 
     NOTE: This method strips nan from arrays first.
     '''
-    times = strip_nan(times)
-    values = strip_nan(values)
+    valid = find_nan(values)
+    values = values[valid]
+    times = times[valid]
 
     interpolator = interpolate.interp1d(times, values)
 
@@ -95,9 +96,10 @@ def periodogram_opencl(t, m, f):
 
     Note: This routine strips datapoints if it is nan
     '''
-    t = strip_nan(t)
-    m = strip_nan(m)
-    f = strip_nan(f)
+    valid = find_nan(m)
+    t = t[valid]
+    m = m[valid]
+
 
     # create a context and a job queue
     ctx = cl.create_some_context()
@@ -172,9 +174,9 @@ def periodogram_parallel(t, m, f, threads=None):
         threads = 4
 
     # strip nan
-    t = strip_nan(t)
-    m = strip_nan(m)
-    f = strip_nan(f)
+    valid = find_nan(m)
+    t = t[valid]
+    m = m[valid]
 
     ampsf90omp_2 = f90periodogram.periodogram2(t, m, f, t.size, f.size,
                                                threads)
@@ -200,9 +202,9 @@ def periodogram_numpy(t, m, freqs):
     '''
 
     # strip nan
-    t = strip_nan(t)
-    m = strip_nan(m)
-    f = strip_nan(freqs)
+    valid = find_nan(m)
+    t = t[valid]
+    m = m[valid]
 
     # calculate the dft
     amps = np.zeros(freqs.size, dtype='float')
