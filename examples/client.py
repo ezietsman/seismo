@@ -1,5 +1,5 @@
 import requests
-import pickle
+import json
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -10,10 +10,13 @@ if __name__ == "__main__":
     y = np.sin(2*np.pi*59*x)
 
     url = 'http://localhost:5000/run_command'
-    data = pickle.dumps((x, y))
+    data = json.dumps((x.tolist(), y.tolist()))
     req = requests.put(url, data={'command': 'fast_deeming', 'args': data})
 
-    f, a, t, m = pickle.loads(req.json())
+    try:
+        f, a, t, m = json.loads(req.json())
+    except TypeError:
+        print(req.json())
 
     plt.plot(f, a)
     plt.show()
