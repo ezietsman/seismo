@@ -29,7 +29,11 @@ class SeismoServerApi(restful.Resource):
                 args[i] = np.array(arg)
 
         if function in dir(seismo):
-            result = getattr(seismo, function)(*args)
+            try:
+                result = getattr(seismo, function)(*args)
+            except Exception as exc:
+                return "Problem calling {}.\
+                    Exception given:\n{}".format(function, exc)
         else:
             return "Error"
 
