@@ -5,6 +5,7 @@ import json
 
 import seismo
 import numpy as np
+import utils
 
 
 class RemoteFunction(object):
@@ -25,23 +26,25 @@ class RemoteFunction(object):
 
     def __call__(self, *args):
         ''' Function that calls name(*args) on remote server'''
-        args = list(args)
-        for i, arg in enumerate(args):
-            if isinstance(arg, np.ndarray):
-                args[i] = arg.tolist()
+        payload = utils.pickle_zip(args)
+#       args = list(args)
+#       for i, arg in enumerate(args):
+#           if isinstance(arg, np.ndarray):
+#               args[i] = arg.tolist()
 
-        data = {'command': self.name, 'args': json.dumps(args)}
+        data = {'command': self.name, 'args': payload}
 
         req = requests.put(self.command_url, data=data)
 
         try:
-            result = json.loads(req.json())
+#           result = json.loads(req.json())
+            result = utils.unpickle_zip(req.json())
         except TypeError:
             print(req.json())
 
-        for i, res in enumerate(result):
-            if isinstance(res, list):
-                result[i] = np.array(res)
+#       for i, res in enumerate(result):
+#           if isinstance(res, list):
+#               result[i] = np.array(res)
 
         return result
 

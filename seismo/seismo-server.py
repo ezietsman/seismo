@@ -6,13 +6,12 @@ on it instead of running tasks on the local machine which may be slow or have
 no GPU etc.
 
 '''
-import json
-
 from flask import Flask, request
 from flask.ext import restful
 
 import seismo
 import numpy as np
+import utils
 
 app = Flask(__name__)
 api = restful.Api(app)
@@ -22,28 +21,18 @@ class SeismoServerApi(restful.Resource):
     def put(self):
 
         function = request.form['command']
-        args = json.loads(request.form['args'])
-        for i, arg in enumerate(args):
-            # change the lists into numpy arrays
-            if isinstance(arg, list):
-                args[i] = np.array(arg)
+        args = utils.unpickle_zip(request.form['args'])
 
         if function in dir(seismo):
             try:
                 result = getattr(seismo, function)(*args)
             except Exception as exc:
                 return "Problem calling {}.\
-                    Exception given:\n{}".format(function, exc)
+                    Exception given:\n{}".format(function, str(exc))
         else:
             return "Error"
 
-        result = list(result)
-
-        for i, res in enumerate(result):
-            if isinstance(res, np.ndarray):
-                result[i] = res.tolist()
-
-        return json.dumps(result)
+        return utils.pickle_zip(result)
 
 api.add_resource(SeismoServerApi, '/run_command')
 
