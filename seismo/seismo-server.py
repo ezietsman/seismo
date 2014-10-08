@@ -27,10 +27,10 @@ class SeismoServerApi(restful.Resource):
             try:
                 result = getattr(seismo, function)(*args)
             except Exception as exc:
-                return "Problem calling {}.\
-                    Exception given:\n{}".format(function, str(exc))
+                return utils.pickle_zip("Problem calling {}.\
+                    Exception given:\n{}".format(function, str(exc)))
         else:
-            return "Error"
+            return utils.pickle_zip("Error")
 
         return utils.pickle_zip(result)
 
