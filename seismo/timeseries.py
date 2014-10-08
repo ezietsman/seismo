@@ -220,7 +220,8 @@ def periodogram_numpy(t, m, freqs):
     return amps
 
 
-def deeming(times, values, frequencies=None, method='opencl'):
+def deeming(times, values, frequencies=None, method='opencl',
+            opencl_max_chunk=10000):
     ''' Calculate the Deeming periodogram of values at times.
     Inputs:
         times: numpy array containing time_stamps
@@ -239,6 +240,8 @@ def deeming(times, values, frequencies=None, method='opencl'):
             'numpy' uses a serial implementation that only requires numpy to be
             installed. This one is probably the slowest of the 3 options for
             larger input data sizes
+        opencl_max_chunk: defaults to 10000. If you get "Cl out of resources"
+        error, make this smaller
 
     Returns (frequency, amplitude) arrays.
     '''
@@ -256,7 +259,19 @@ def deeming(times, values, frequencies=None, method='opencl'):
 
     if method == 'opencl':
         if OPENCL:
-            amps = periodogram_opencl(times, values, frequencies)
+            # split the calculation by frequency in chunks at most
+            # 10000 (for now)
+            chunks = (frequencies.size / opencl_max_chunk) + 1
+            f_split = np.array_split(frequencies, chunks)
+            amps_split = []
+            for f in f_split:
+                amps = periodogram_opencl(times, values, f)
+                amps_split.append(amps)
+
+            amps = np.concatenate(amps_split)
+
+
+
         else:
             print("WARNING! pyopencl not found. Falling back to openmp version")
             cores = multiprocessing.cpu_count()
