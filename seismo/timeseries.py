@@ -155,11 +155,8 @@ def periodogram_opencl(t, m, f):
                                  cl.program_build_info.LOG))
         raise
 
-    # not sure if this is the right name
-    blocksize = min((10000,), amps_g.shape)
-
     # call the function and copy the values from the buffer to a numpy array
-    prg.periodogram(queue, blocksize, None,
+    prg.periodogram(queue, amps_g.shape, None,
                     times_g,
                     mags_g,
                     freqs_g,
