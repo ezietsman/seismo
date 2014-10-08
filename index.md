@@ -14,6 +14,12 @@ At the moment Seismo can only do Deeming Periodograms but this will change
 quickly.
 
 
+## Current features
+
+* Parallel Deeming periodogram routines (CPU/GPU)
+* Simultaneous fitting of multiple sine waves
+* Network access. Call seismo routines on a remote server (Python 2.7 only at the moment)
+
 ## Installation
 
 Make sure you have `python 2.7` or newer as well as `pip`
@@ -27,17 +33,51 @@ from there first then install pip.
 On Debian/Ubuntu
 
     sudo apt-get install python-pip
-    
-Once pip is installed, install `seismo` with:
 
-    pip install -r requirements.txt
+
+Get `seismo` with
+
+    git clone git@github.com:ezietsman/seismo.git
+
+Once pip is installed, install `seismo` by running the following in the seismo folder.
+
+    pip install numpy flask-restful mako pyopencl matplotlib scipy requests
     pip install .
 
-in this folder.
 
-You may need `sudo` for the last command.
+You may need `sudo` for these commands in linux
 
 Please let me know if it doesn't work for you.
+
+
+## Example
+
+{% highlight python %}
+import matplotlib
+from matplotlib.pyplot import subplot, plot, show
+from numpy import linspace, sin, pi
+import seismo
+
+matplotlib.style.use('ggplot')
+
+x = linspace(0, 0.05, 500)
+y = 0.6*sin(2*pi*240*x)\
+    + 0.15*sin(2*pi*1303*x + 0.4)\
+    + 0.1*sin(2*pi*3000*x)
+
+f, a = seismo.deeming(x, y)
+
+subplot(211)
+plot(x, y, '.')
+subplot(212)
+plot(f, a)
+
+show()
+{% endhighlight %}
+![images/ex1.png](images/ex1.png)
+
+
+See the `examples` folder for more detailed examples. I'm sorry, I haven't written proper docs yet. Coming Soon!
 
 ## Running the unit tests
 
@@ -58,27 +98,3 @@ SDK, I do not know what is needed for AMD cards and CPUs.
 **NOTE:** You do NOT need the CUDA SDK for the opencl driver.
 
 
-## Modules
-
-seismo contains the following modules:
-
-
-* timeseries
-    - serial and parallel Deeming periodogram implementations.
-* fitting
-    - In progress. Sinewave fitting routines will go in here.
-
-
-## Goals
-
-Kepler datasets can be very long and contain many datapoints. These take a long
-time to calculate via a naive O(N^2) algorithm (but needed because I don't have
-a better algorithm for unevenly sampled data that I'm happy with). For this
-reason I'm trying to create something that can run more or less with only some
-user input, so that I can let it run by itself and save each step in the
-output.
-
-Each DFT for the particular dataset I'm interested in at the moment takes
-about 50 minutes to run on my GTX 760, and about 16 hours on my MBP's i5 with 2
-threads, and I may need to do 40 - 50 of them to extract all the frequencies.
-(Donations for a Nvidia 980 welcome)

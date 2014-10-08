@@ -151,9 +151,10 @@ img {
 p img {
   display: inline;
   margin: 0;
-  padding: 0;
+  padding: auto;
   vertical-align: middle;
   text-align: center;
+  max-width: 100%;
   border: none;
 }
 
@@ -418,6 +419,11 @@ Small Device Styles
     min-width: 320px;
     max-width: 480px;
     font-size: 11px;
+  }
+
+  p > img {
+    min-width: 320px;
+    max-width: 480px;
   }
 
 }
