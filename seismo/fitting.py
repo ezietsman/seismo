@@ -9,12 +9,7 @@ class signal(object):
     '''
 
     def __init__(self):
-        ''' Initialise signal.
-        Inputs:
-            x: numpy array with e.g. timestamps
-            y: numpy array with value at timestamps
-            err: numpy array with error estimates
-        '''
+        ''' Initialise signal. '''
         self.components = []
 
     def add_component(self, component):
