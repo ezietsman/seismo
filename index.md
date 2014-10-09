@@ -50,7 +50,9 @@ You may need `sudo` for these commands in linux
 Please let me know if it doesn't work for you.
 
 
-## Example
+## Examples
+
+### Finding peaks in time-series data
 
 {% highlight python %}
 import matplotlib
@@ -60,13 +62,16 @@ import seismo
 
 matplotlib.style.use('ggplot')
 
+# create fake data
 x = linspace(0, 0.05, 500)
 y = 0.6*sin(2*pi*240*x)\
     + 0.15*sin(2*pi*1303*x + 0.4)\
     + 0.1*sin(2*pi*3000*x)
 
+# Calculate Deeming periodogram 
 f, a = seismo.deeming(x, y)
 
+# plot
 subplot(211)
 plot(x, y, '.')
 subplot(212)
@@ -76,6 +81,37 @@ show()
 {% endhighlight %}
 ![images/ex1.png](images/ex1.png)
 
+### Fitting a sinewave to noisy data
+
+
+{% highlight python %}
+import matplotlib
+from matplotlib.pyplot import subplot, plot, show
+from numpy import linspace, sin, pi, random
+import seismo
+
+matplotlib.style.use('ggplot')
+
+# create fake data
+x = linspace(0, 0.05, 500)
+y = 0.6*sin(2*pi*120*x) + 0.2*random.randn(x.size)
+
+# find peak using periodogram
+f, a = seismo.deeming(x, y)
+fmax, amax = seismo.find_peak(f, a)
+
+# create and fit signal
+signal = seismo.signal()
+comp1 = seismo.sinewave(amax, fmax, 0)
+signal.add_component(comp1)
+signal.fit(x, y)
+
+# plot
+plot(x, y, '.')
+plot(x, signal.evaluate(x), lw=2)
+show()
+{% endhighlight %}
+![images/ex2.png](images/ex2.png)
 
 See the `examples` folder for more detailed examples. I'm sorry, I haven't written proper docs yet. Coming Soon!
 
