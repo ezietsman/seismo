@@ -35,7 +35,7 @@ def test_scipy_example():
     f = np.linspace(0.01, 10, nout)
     # get periodogram
     pgram_sci = sci_lomb_scargle(x, y, f)
-    pgram_cl = lomb_scargle.lomb_scarge(x, y, f)
+    pgram_cl = lomb_scargle(x, y, f)
     assert(np.allclose(pgram_sci, pgram_cl))
 
 
